@@ -22,4 +22,4 @@ This application streamlines the process of identifying recipes you can cook imm
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/MaxTrollinger1/whats-in-my-fridge.git
+   git clone https://github.com/MaxTrollinger1/WhatsInMyFridge.git
