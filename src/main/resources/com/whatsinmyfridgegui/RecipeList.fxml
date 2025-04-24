@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.whatsinmyfridgegui.RecipeListController">
+
+    <!-- HEADER: Back + Title -->
+    <top>
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <padding><Insets top="20" left="20"/></padding>
+            <Button text="← Back"
+                    styleClass="purple-button"
+                    onAction="#onBack"/>
+            <Label text="WhatsInMyFridge"
+                   style="-fx-font-size:24px; -fx-font-weight:bold;"/>
+        </HBox>
+    </top>
+
+    <!-- CENTER: Search/Filter + TitledPane of Recipes -->
+    <center>
+        <VBox spacing="10">
+            <padding><Insets top="10" right="20" bottom="10" left="20"/></padding>
+
+            <HBox spacing="10">
+                <TextField fx:id="searchField"
+                           promptText="Search recipes..."
+                           HBox.hgrow="ALWAYS"/>
+                <Button fx:id="filterButton"
+                        text="Filter"
+                        onAction="#onFilter"/>
+            </HBox>
+
+            <TitledPane text="Recipes" collapsible="false" VBox.vgrow="ALWAYS">
+                <content>
+                    <ListView fx:id="recipeListView" prefHeight="300"/>
+                </content>
+            </TitledPane>
+        </VBox>
+    </center>
+
+    <!-- FOOTER: Add Recipe -->
+    <bottom>
+        <HBox alignment="CENTER_RIGHT">
+            <padding><Insets top="0" right="20" bottom="20" left="20"/></padding>
+            <Button text="Add"
+                    fx:id="addRecipeButton"
+                    styleClass="purple-button"
+                    onAction="#onAddRecipe"/>
+        </HBox>
+    </bottom>
+</BorderPane>
