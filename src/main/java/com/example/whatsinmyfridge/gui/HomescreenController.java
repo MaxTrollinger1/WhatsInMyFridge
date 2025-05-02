@@ -1,4 +1,4 @@
-package com.whatsinmyfridgegui;
+package com.example.whatsinmyfridge.gui;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
@@ -10,7 +10,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
@@ -119,7 +118,7 @@ public class HomescreenController {
     }
 
     @FXML public void onViewAllRecipes(ActionEvent evt) throws IOException {
-        Parent root = FXMLLoader.load(getClass().getResource("RecipeList.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/com/whatsinmyfridgegui/RecipeList.fxml"));
         Stage st = (Stage)((Node)evt.getSource()).getScene().getWindow();
         st.getScene().setRoot(root);
     }

@@ -1,4 +1,4 @@
-package com.whatsinmyfridgegui;
+package com.example.whatsinmyfridge.gui;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;

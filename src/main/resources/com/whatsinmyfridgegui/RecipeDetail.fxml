@@ -13,7 +13,7 @@
 
 <AnchorPane xmlns="http://javafx.com/javafx/19"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.example.whatsinmyfridgegui.RecipeDetailController"
+            fx:controller="com.example.whatsinmyfridge.gui.RecipeDetailController"
             prefWidth="600" prefHeight="500">
 
     <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10"

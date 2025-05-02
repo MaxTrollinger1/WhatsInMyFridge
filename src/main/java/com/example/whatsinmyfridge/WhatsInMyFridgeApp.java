@@ -1,4 +1,4 @@
-package com.whatsinmyfridgegui;
+package com.example.whatsinmyfridge;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -9,10 +9,10 @@ import javafx.stage.Stage;
 public class WhatsInMyFridgeApp extends Application {
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("Homescreen.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/com/whatsinmyfridgegui/Homescreen.fxml"));
         Scene scene = new Scene(root, 900, 600);
         scene.getStylesheets().add(
-                getClass().getResource("style.css").toExternalForm()
+                getClass().getResource("/com/whatsinmyfridgegui/style.css").toExternalForm()
         );
         stage.setTitle("WhatsInMyFridge");
         stage.setScene(scene);

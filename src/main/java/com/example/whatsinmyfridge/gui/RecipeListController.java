@@ -1,4 +1,4 @@
-package com.whatsinmyfridgegui;
+package com.example.whatsinmyfridge.gui;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -76,7 +76,7 @@ public class RecipeListController {
                 RecipeItem selected = recipeListView.getSelectionModel().getSelectedItem();
                 if (selected != null) {
                     try {
-                        FXMLLoader loader = new FXMLLoader(getClass().getResource("RecipeDetail.fxml"));
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/whatsinmyfridgegui/RecipeDetail.fxml"));
                         Parent detailRoot = loader.load();
                         RecipeDetailController rc = loader.getController();
                         rc.setRecipe(selected);
@@ -122,7 +122,7 @@ public class RecipeListController {
     @FXML
     private void onAddRecipe(ActionEvent evt) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("RecipeAdd.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/whatsinmyfridgegui/RecipeAdd.fxml"));
             Parent addRoot = loader.load();
             RecipeAddController ac = loader.getController();
             ac.setRecipeList(recipes);
@@ -135,7 +135,7 @@ public class RecipeListController {
 
     @FXML
     private void onBack(ActionEvent evt) throws IOException {
-        Parent home = FXMLLoader.load(getClass().getResource("HomeScreen.fxml"));
+        Parent home = FXMLLoader.load(getClass().getResource("/com/whatsinmyfridgegui/HomeScreen.fxml"));
         Stage st = (Stage)((Node)evt.getSource()).getScene().getWindow();
         st.getScene().setRoot(home);
     }

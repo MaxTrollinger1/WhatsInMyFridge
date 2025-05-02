@@ -1,4 +1,4 @@
-package com.whatsinmyfridgegui;
+package com.example.whatsinmyfridge.gui;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
