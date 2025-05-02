@@ -1,4 +1,4 @@
-package com.example.whatsinmyfridgegui;
+package com.whatsinmyfridgegui;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -7,11 +7,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -21,46 +17,44 @@ import java.io.IOException;
 
 public class RecipeListController {
     @FXML private TextField searchField;
+    @FXML private Button    searchButton;
     @FXML private Button    filterButton;
     @FXML private ListView<RecipeItem> recipeListView;
     @FXML private Button    addRecipeButton;
+    @FXML private Button    backButton;
 
-    // Shared list of recipes
-    private static final ObservableList<RecipeItem> recipes =
-            FXCollections.observableArrayList(
-                    new RecipeItem("Butter Chicken"),
-                    new RecipeItem("Pico De Gallo"),
-                    new RecipeItem("Salisbury Steak")
-            );
+    private static final ObservableList<RecipeItem> recipes = FXCollections.observableArrayList(
+            new RecipeItem("Butter Chicken"),
+            new RecipeItem("Pico De Gallo"),
+            new RecipeItem("Salisbury Steak")
+    );
 
     @FXML
     public void initialize() {
-        // 1) Populate the ListView
         recipeListView.setItems(recipes);
+        // ensure scrolling
+        recipeListView.setFocusTraversable(true);
 
-        // 2) Custom cell: show name + spacer + flag icon
         recipeListView.setCellFactory(lv -> new ListCell<>() {
-            private final Label  nameLabel = new Label();
+            private final Label nameLabel = new Label();
             private final Region spacer    = new Region();
-            private final Button flagBtn   = new Button("⚑");
-            private final HBox   box        = new HBox(10, nameLabel, spacer, flagBtn);
+            private final ToggleButton flagBtn = new ToggleButton("⚑");
+            private final HBox hbox;
 
             {
+                // grow label and spacer, style text larger
+                nameLabel.setStyle("-fx-font-size: 14px;");
                 HBox.setHgrow(spacer, Priority.ALWAYS);
-                flagBtn.getStyleClass().add("flag-icon");
+                flagBtn.setStyle("-fx-font-size:16px; -fx-background-color: transparent;");
                 flagBtn.setOnAction(e -> {
-                    RecipeItem item = getItem();
-                    if (item != null) {
-                        boolean nowFlagged = !item.isFlagged();
-                        item.setFlagged(nowFlagged);
-                        ObservableList<String> styles = flagBtn.getStyleClass();
-                        if (nowFlagged) {
-                            if (!styles.contains("flagged")) styles.add("flagged");
-                        } else {
-                            styles.remove("flagged");
-                        }
+                    if (flagBtn.isSelected()) {
+                        flagBtn.setStyle("-fx-font-size:16px; -fx-text-fill: gold; -fx-background-color: transparent;");
+                    } else {
+                        flagBtn.setStyle("-fx-font-size:16px; -fx-text-fill: black; -fx-background-color: transparent;");
                     }
                 });
+                hbox = new HBox(10, nameLabel, spacer, flagBtn);
+                hbox.setStyle("-fx-padding: 5px;");
             }
 
             @Override
@@ -71,28 +65,23 @@ public class RecipeListController {
                     setGraphic(null);
                 } else {
                     nameLabel.setText(item.getName());
-                    ObservableList<String> styles = flagBtn.getStyleClass();
-                    styles.remove("flagged");
-                    if (item.isFlagged()) styles.add("flagged");
-                    setGraphic(box);
+                    setGraphic(hbox);
                 }
             }
         });
 
-        // 3) Double‐click → detail page
+        // double-click to open detail
         recipeListView.setOnMouseClicked(evt -> {
             if (evt.getClickCount() == 2) {
-                RecipeItem sel = recipeListView.getSelectionModel().getSelectedItem();
-                if (sel != null) {
+                RecipeItem selected = recipeListView.getSelectionModel().getSelectedItem();
+                if (selected != null) {
                     try {
-                        FXMLLoader loader = new FXMLLoader(
-                                getClass().getResource("RecipeDetail.fxml")
-                        );
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("RecipeDetail.fxml"));
                         Parent detailRoot = loader.load();
-                        RecipeDetailController dc = loader.getController();
-                        dc.setRecipe(sel);
-                        Stage stage = (Stage) recipeListView.getScene().getWindow();
-                        stage.getScene().setRoot(detailRoot);
+                        RecipeDetailController rc = loader.getController();
+                        rc.setRecipe(selected);
+                        Stage st = (Stage) recipeListView.getScene().getWindow();
+                        st.getScene().setRoot(detailRoot);
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
@@ -100,14 +89,17 @@ public class RecipeListController {
             }
         });
 
-        // 4) Wire buttons
+        searchButton.setOnAction(this::onSearch);
+        filterButton.setOnAction(e -> { /* no-op */ });
         addRecipeButton.setOnAction(this::onAddRecipe);
-        filterButton   .setOnAction(this::onFilter);
+        backButton.setOnAction(e -> {
+            try { onBack(e); }
+            catch (IOException ex) { ex.printStackTrace(); }
+        });
     }
 
-    /** Filter recipes by the searchField text */
     @FXML
-    private void onFilter(ActionEvent evt) {
+    private void onSearch(ActionEvent evt) {
         String text = searchField.getText().trim().toLowerCase();
         if (text.isEmpty()) {
             recipeListView.setItems(recipes);
@@ -122,13 +114,15 @@ public class RecipeListController {
         }
     }
 
-    /** Show the Add‐Recipe page */
+    @FXML
+    private void onFilter(ActionEvent evt) {
+        // stub: filter logic
+    }
+
     @FXML
     private void onAddRecipe(ActionEvent evt) {
         try {
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("RecipeAdd.fxml")
-            );
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("RecipeAdd.fxml"));
             Parent addRoot = loader.load();
             RecipeAddController ac = loader.getController();
             ac.setRecipeList(recipes);
@@ -139,11 +133,10 @@ public class RecipeListController {
         }
     }
 
-    /** Back to the Home screen */
     @FXML
     private void onBack(ActionEvent evt) throws IOException {
-        Parent home = FXMLLoader.load(getClass().getResource("Homescreen.fxml"));
-        Stage stage = (Stage)((Node)evt.getSource()).getScene().getWindow();
-        stage.getScene().setRoot(home);
+        Parent home = FXMLLoader.load(getClass().getResource("HomeScreen.fxml"));
+        Stage st = (Stage)((Node)evt.getSource()).getScene().getWindow();
+        st.getScene().setRoot(home);
     }
 }

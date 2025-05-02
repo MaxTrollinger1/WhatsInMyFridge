@@ -1,8 +1,7 @@
-package com.example.whatsinmyfridgegui;
+package com.whatsinmyfridgegui;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -11,76 +10,90 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;
-import javafx.scene.layout.VBox;
-import javafx.scene.layout.HBox;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
 
 public class RecipeDetailController {
-    @FXML private Label   nameLabel;
-    @FXML private TextField nameField;
-    @FXML private Button  toggleEditButton;
 
-    @FXML private Label    descriptionLabel;
+    @FXML private Button backButton;
+    @FXML private Button toggleSaveButton;
+
+    @FXML private Label nameLabel;
+    @FXML private TextField nameField;
+
+    @FXML private Label descriptionLabel;
     @FXML private TextArea descriptionArea;
 
-    @FXML private Button        addIngredientButton;
+    @FXML private Label instructionsLabel;
+    @FXML private TextArea instructionsArea;
+
+    @FXML private Button addIngredientButton;
     @FXML private TableView<InventoryItem> ingredientsTable;
     @FXML private TableColumn<InventoryItem,String> ingNameCol;
     @FXML private TableColumn<InventoryItem,String> ingAmountCol;
+    @FXML private TableColumn<InventoryItem,String> ingMeasurementCol;
     @FXML private TableColumn<InventoryItem,InventoryItem> ingActionCol;
 
-    @FXML private Label    instructionsLabel;
-    @FXML private TextArea instructionsArea;
-
     private RecipeItem recipe;
-    private boolean    editMode = false;
+    private boolean editMode = false;
 
     @FXML
     private void initialize() {
-        // start in view‐only mode
-        setViewMode();
+        // wire button handlers
+        toggleSaveButton.setOnAction(this::onToggleSave);
+        backButton.setOnAction(this::onBack);
 
-        // wire ingredient columns
+        // table columns
         ingNameCol.setCellValueFactory(c -> c.getValue().nameProperty());
         ingAmountCol.setCellValueFactory(c -> c.getValue().amountProperty());
+        ingMeasurementCol.setCellValueFactory(c -> c.getValue().measurementProperty());
 
-        // delete button in action column
-        ingActionCol.setCellValueFactory(c ->
-                new ReadOnlyObjectWrapper<>(c.getValue())
-        );
+        ingNameCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        ingAmountCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        ingMeasurementCol.setCellFactory(TextFieldTableCell.forTableColumn());
+
+        ingNameCol.setOnEditCommit(e -> e.getRowValue().setName(e.getNewValue()));
+        ingAmountCol.setOnEditCommit(e -> {
+            String v = e.getNewValue();
+            if (v.matches("\\d+")) {
+                e.getRowValue().setAmount(v);
+            } else {
+                new Alert(Alert.AlertType.WARNING, "Amount must be integer.").showAndWait();
+                ingredientsTable.refresh();
+            }
+        });
+        ingMeasurementCol.setOnEditCommit(e -> e.getRowValue().setMeasurement(e.getNewValue()));
+
+        ingActionCol.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(c.getValue()));
         ingActionCol.setCellFactory(col -> new TableCell<>() {
             private final Button del = new Button("🗑");
-            { del.setOnAction(e ->
-                    getTableView().getItems().remove(getItem())
-            ); }
+            { del.setOnAction(evt -> getTableView().getItems().remove(getItem())); }
             @Override protected void updateItem(InventoryItem item, boolean empty) {
                 super.updateItem(item, empty);
-                setGraphic(empty || !editMode ? null : del);
+                setGraphic(empty ? null : del);
             }
         });
 
-        // auto‐size table
+        ingredientsTable.setTableMenuButtonVisible(false);
         ingredientsTable.setFixedCellSize(24);
         ingredientsTable.setMinHeight(Region.USE_PREF_SIZE);
+
+        // remove default placeholder text
+        ingredientsTable.setPlaceholder(new Label(""));
+
+        enterViewMode();
     }
 
-    /** Called by the list controller on double‐click */
     public void setRecipe(RecipeItem recipe) {
         this.recipe = recipe;
         nameLabel.setText(recipe.getName());
         nameField.setText(recipe.getName());
 
-        // sample ingredients (replace with your JSON)
-        List<InventoryItem> sample = List.of(
-                new InventoryItem("Chicken thighs","1 lb"),
-                new InventoryItem("Yogurt",        "1 cup")
-        );
-        ObservableList<InventoryItem> items = FXCollections.observableArrayList(sample);
+        ObservableList<InventoryItem> items = recipe.getIngredients();
         ingredientsTable.setItems(items);
         ingredientsTable.prefHeightProperty().bind(
                 Bindings.size(items)
@@ -88,111 +101,116 @@ public class RecipeDetailController {
                         .add(28)
         );
 
-        // sample description & instructions
-        descriptionLabel.setText("A luscious tomato-cream marinade...");
-        descriptionArea.setText(descriptionLabel.getText());
+        descriptionLabel.setText(recipe.getDescription());
+        descriptionArea.setText(recipe.getDescription());
 
-        instructionsLabel.setText("1. Marinate…\n2. Cook…\n3. Serve…");
-        instructionsArea.setText(instructionsLabel.getText());
+        instructionsLabel.setText(recipe.getInstructions());
+        instructionsArea.setText(recipe.getInstructions());
     }
 
-    /** Toggle between view & edit mode */
     @FXML
-    private void onToggleEdit(ActionEvent evt) {
-        editMode = !editMode;
-        if (editMode) {
-            setEditMode();
+    private void onToggleSave(ActionEvent evt) {
+        if (!editMode) {
+            editMode = true;
+            toggleSaveButton.setText("Save");
+            enterEditMode();
         } else {
-            // save and go back to view
             recipe.setName(nameField.getText().trim());
-            nameLabel.setText(recipe.getName());
-
-            descriptionLabel.setText(descriptionArea.getText());
-            instructionsLabel.setText(instructionsArea.getText());
-
-            setViewMode();
+            recipe.setDescription(descriptionArea.getText().trim());
+            recipe.setInstructions(instructionsArea.getText().trim());
+            editMode = false;
+            toggleSaveButton.setText("Edit");
+            enterViewMode();
         }
-        toggleEditButton.setText(editMode ? "Save" : "Edit");
     }
 
-    private void setViewMode() {
-        nameLabel.setVisible(true);      nameLabel.setManaged(true);
-        nameField.setVisible(false);     nameField.setManaged(false);
+    private void enterViewMode() {
+        nameLabel.setVisible(true);   nameLabel.setManaged(true);
+        nameField.setVisible(false);  nameField.setManaged(false);
 
-        descriptionLabel.setVisible(true);
-        descriptionArea.setVisible(false);
-        descriptionArea.setManaged(false);
+        descriptionLabel.setVisible(true);   descriptionLabel.setManaged(true);
+        descriptionArea.setVisible(false);   descriptionArea.setManaged(false);
 
-        instructionsLabel.setVisible(true);
-        instructionsArea.setVisible(false);
-        instructionsArea.setManaged(false);
-
-        addIngredientButton.setVisible(false);
-        addIngredientButton.setDisable(true);
+        instructionsLabel.setVisible(true);   instructionsLabel.setManaged(true);
+        instructionsArea.setVisible(false);   instructionsArea.setManaged(false);
 
         ingredientsTable.setEditable(false);
-        ingredientsTable.refresh();
+        ingActionCol.setVisible(false);
+
+        addIngredientButton.setVisible(false);
+        addIngredientButton.setManaged(false);
     }
 
-    private void setEditMode() {
-        nameLabel.setVisible(false);     nameLabel.setManaged(false);
-        nameField.setVisible(true);      nameField.setManaged(true);
+    private void enterEditMode() {
+        nameLabel.setVisible(false);  nameLabel.setManaged(false);
+        nameField.setVisible(true);   nameField.setManaged(true);
 
-        descriptionLabel.setVisible(false);
-        descriptionArea.setVisible(true);
-        descriptionArea.setManaged(true);
+        descriptionLabel.setVisible(false);   descriptionLabel.setManaged(false);
+        descriptionArea.setVisible(true);     descriptionArea.setManaged(true);
 
-        instructionsLabel.setVisible(false);
-        instructionsArea.setVisible(true);
-        instructionsArea.setManaged(true);
-        instructionsArea.setEditable(true);
-
-        addIngredientButton.setVisible(true);
-        addIngredientButton.setDisable(false);
+        instructionsLabel.setVisible(false);   instructionsLabel.setManaged(false);
+        instructionsArea.setVisible(true);     instructionsArea.setManaged(true);
 
         ingredientsTable.setEditable(true);
-        ingredientsTable.refresh();
+        ingActionCol.setVisible(true);
+
+        addIngredientButton.setVisible(true);
+        addIngredientButton.setManaged(true);
     }
 
-    /** Show dialog to add a new ingredient */
     @FXML
     private void onAddIngredient(ActionEvent evt) {
+        if (!editMode) return;
+
         Dialog<InventoryItem> dlg = new Dialog<>();
         dlg.setTitle("Add Ingredient");
         dlg.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
-        VBox box = new VBox(10);
-        box.setPadding(new Insets(20));
-        TextField n = new TextField(), a = new TextField();
-        n.setPromptText("Ingredient");  a.setPromptText("Amount");
-        box.getChildren().setAll(new Label("Name:"), n, new Label("Amount:"), a);
-        dlg.getDialogPane().setContent(box);
+        GridPane grid = new GridPane();
+        grid.setHgap(10); grid.setVgap(10); grid.setPadding(new Insets(20));
+        TextField nm = new TextField(), amt = new TextField(), meas = new TextField();
+        nm.setPromptText("Ingredient"); amt.setPromptText("Amount"); meas.setPromptText("Measurement (opt)");
+        amt.setTextFormatter(new TextFormatter<>(c ->
+                c.getControlNewText().matches("\\d*") ? c : null
+        ));
+        grid.add(new Label("Name:"),        0, 0);
+        grid.add(nm,                        1, 0);
+        grid.add(new Label("Amount:"),      0, 1);
+        grid.add(amt,                       1, 1);
+        grid.add(new Label("Measurement:"), 0, 2);
+        grid.add(meas,                      1, 2);
+        dlg.getDialogPane().setContent(grid);
 
         Node ok = dlg.getDialogPane().lookupButton(ButtonType.OK);
         ok.setDisable(true);
-        n.textProperty().addListener((o,ov,nv) ->
-                ok.setDisable(nv.trim().isEmpty() || a.getText().trim().isEmpty())
+        nm.textProperty().addListener((o,ov,nv) ->
+                ok.setDisable(nv.trim().isEmpty() || amt.getText().trim().isEmpty())
         );
-        a.textProperty().addListener((o,ov,nv) ->
-                ok.setDisable(nv.trim().isEmpty() || n.getText().trim().isEmpty())
+        amt.textProperty().addListener((o,ov,nv) ->
+                ok.setDisable(nv.trim().isEmpty() || nm.getText().trim().isEmpty())
         );
 
-        dlg.setResultConverter(btn ->
-                btn == ButtonType.OK
-                        ? new InventoryItem(n.getText().trim(), a.getText().trim())
-                        : null
+        dlg.setResultConverter(bt -> bt == ButtonType.OK
+                ? new InventoryItem(nm.getText().trim(), amt.getText().trim(), meas.getText().trim())
+                : null
         );
-        Optional<InventoryItem> res = dlg.showAndWait();
-        res.ifPresent(item -> ingredientsTable.getItems().add(item));
+        dlg.showAndWait().ifPresent(item -> ingredientsTable.getItems().add(item));
     }
 
-    /** Return to the recipes list screen */
     @FXML
-    private void onBackToList(ActionEvent evt) throws IOException {
-        Parent list = FXMLLoader.load(
-                getClass().getResource("RecipeList.fxml")
-        );
-        Stage stage = (Stage)((Node)evt.getSource()).getScene().getWindow();
-        stage.getScene().setRoot(list);
+    private void onBack(ActionEvent evt) {
+        try {
+            if (editMode) {
+                editMode = false;
+                toggleSaveButton.setText("Edit");
+                enterViewMode();
+            } else {
+                Parent list = FXMLLoader.load(getClass().getResource("RecipeList.fxml"));
+                Stage st = (Stage)((Node)evt.getSource()).getScene().getWindow();
+                st.getScene().setRoot(list);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

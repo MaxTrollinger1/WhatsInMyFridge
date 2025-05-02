@@ -1,4 +1,4 @@
-package com.example.whatsinmyfridgegui;
+package com.whatsinmyfridgegui;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
