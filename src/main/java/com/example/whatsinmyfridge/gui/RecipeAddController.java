@@ -119,7 +119,7 @@ public class RecipeAddController {
 
     @FXML
     private void onCancel(ActionEvent evt) throws IOException {
-        Parent list = FXMLLoader.load(getClass().getResource("RecipeList.fxml"));
+        Parent list = FXMLLoader.load(getClass().getResource("/com/whatsinmyfridgegui/RecipeList.fxml"));
         Stage st = (Stage)((Node)evt.getSource()).getScene().getWindow();
         st.getScene().setRoot(list);
     }
