@@ -27,7 +27,7 @@ public class DataPersistenceManagerTest {
         commands.put("writef", () ->
         {
             FoodItem item = new FoodItem(FoodNameGenerator.getRandomFoodName(), new java.util.Random().nextInt(100));
-            useScript.WriteNew(item);
+            //useScript.WriteNew(item);
         });
         commands.put("help", () -> {
             System.out.println("Available commands:");

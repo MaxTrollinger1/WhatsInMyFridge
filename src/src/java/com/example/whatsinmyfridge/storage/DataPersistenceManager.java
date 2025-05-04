@@ -43,6 +43,7 @@ public class DataPersistenceManager {
         wrappers.clear();
 
         wrappers.add(new PantryWrapper(LocalTime.now().toString()));
+        wrappers.add(new RecipeWrapper(LocalTime.now().toString()));
     }
 
     /// Loads saved data, or initializes new data if none is found

@@ -1,5 +1,6 @@
 package com.example.whatsinmyfridge.storage.data;
 
+import com.example.whatsinmyfridge.model.Ingredient;
 import com.google.gson.annotations.Expose;
 
 import java.util.ArrayList;
@@ -8,7 +9,7 @@ import java.util.ArrayList;
 public class PantryWrapper extends Data {
 
     @Expose
-    public ArrayList<FoodItem> foodItems;
+    public ArrayList<Ingredient> foodItems;
 
     public PantryWrapper() { // Default constructor for Gson
         this.foodItems = new ArrayList<>();
@@ -23,7 +24,7 @@ public class PantryWrapper extends Data {
         this.fileName = "pantry.json";
     }
 
-    public PantryWrapper(String time, ArrayList<FoodItem> foodItems) {
+    public PantryWrapper(String time, ArrayList<Ingredient> foodItems) {
         super(time);
         this.time = time;
         this.foodItems = foodItems;
@@ -36,7 +37,7 @@ public class PantryWrapper extends Data {
         sb.append("  time: ").append(time).append(",\n");
         sb.append("  fileName: ").append(fileName).append(",\n");
         sb.append("  foodItems: [\n");
-        for (FoodItem foodItem : foodItems) {
+        for (Ingredient foodItem : foodItems) {
             sb.append("    ").append(foodItem.toString()).append(",\n");
         }
         sb.append("  ]\n");

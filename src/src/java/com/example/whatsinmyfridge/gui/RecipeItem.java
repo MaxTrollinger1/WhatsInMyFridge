@@ -1,5 +1,6 @@
 package com.example.whatsinmyfridge.gui;
 
+import com.example.whatsinmyfridge.model.Recipe;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -19,18 +20,15 @@ public class RecipeItem {
 
     /** Constructor for an EMPTY recipe (used on “Add”) */
     public RecipeItem(String name) {
-        this(name, List.of(), "", "");
+        this(new Recipe(name));
     }
 
     /** Full constructor, pass in your own data */
-    public RecipeItem(String name,
-                      List<InventoryItem> ingredients,
-                      String description,
-                      String instructions) {
-        this.name.set(name);
-        this.ingredients.setAll(ingredients);
-        this.description.set(description);
-        this.instructions.set(instructions);
+    public RecipeItem(Recipe recipe) {
+        this.name.set(recipe.getName());
+        this.ingredients.setAll((InventoryItem)FXCollections.observableArrayList(recipe.getIngredients()));
+        this.description.set(recipe.getDescription());
+        this.instructions.set(recipe.getInstructions());
     }
 
     public StringProperty nameProperty()         { return name;        }

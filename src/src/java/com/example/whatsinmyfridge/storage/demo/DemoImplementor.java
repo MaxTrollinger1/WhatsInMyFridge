@@ -1,5 +1,6 @@
 package com.example.whatsinmyfridge.storage.demo;
 
+import com.example.whatsinmyfridge.model.Ingredient;
 import com.example.whatsinmyfridge.storage.IDataPersistence;
 import com.example.whatsinmyfridge.storage.data.Data;
 import com.example.whatsinmyfridge.storage.data.FoodItem;
@@ -11,7 +12,7 @@ import java.util.Objects;
 /// The DemoImplementor Class provides examples of how to utilize
 /// the saving interface on scripts that need to have data persistence functionality
 public class DemoImplementor implements IDataPersistence {
-    private ArrayList<FoodItem> classData = new ArrayList<>();
+    private ArrayList<Ingredient> classData = new ArrayList<>();
 
     public DemoImplementor() {
     }
@@ -39,7 +40,7 @@ public class DemoImplementor implements IDataPersistence {
 
     //region Debug
 
-    public void WriteNew(FoodItem foodItem)
+    public void WriteNew(Ingredient foodItem)
     {
         classData.add(foodItem);
         System.out.println("Wrote New Food Item");

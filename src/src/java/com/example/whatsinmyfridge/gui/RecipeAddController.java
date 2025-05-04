@@ -1,5 +1,7 @@
 package com.example.whatsinmyfridge.gui;
 
+import com.example.whatsinmyfridge.model.Ingredient;
+import com.example.whatsinmyfridge.model.Recipe;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -21,11 +23,11 @@ import java.util.Optional;
 public class RecipeAddController {
     @FXML private TextField nameField;
     @FXML private TextArea  descriptionField;
-    @FXML private TableView<InventoryItem> ingredientsTable;
-    @FXML private TableColumn<InventoryItem,String> ingNameCol;
-    @FXML private TableColumn<InventoryItem,String> ingAmountCol;
-    @FXML private TableColumn<InventoryItem,String> ingMeasurementCol;
-    @FXML private TableColumn<InventoryItem,InventoryItem> ingActionCol;
+    @FXML private TableView<Ingredient> ingredientsTable;
+    @FXML private TableColumn<Ingredient,String> ingNameCol;
+    @FXML private TableColumn<Ingredient,String> ingAmountCol;
+    @FXML private TableColumn<Ingredient,String> ingMeasurementCol;
+    @FXML private TableColumn<Ingredient,Ingredient> ingActionCol;
     @FXML private TextArea  instructionsField;
     @FXML private Button    addIngredientButton;
 
@@ -39,12 +41,12 @@ public class RecipeAddController {
     private void initialize() {
         ingNameCol.setCellValueFactory(c -> c.getValue().nameProperty());
         ingAmountCol.setCellValueFactory(c -> c.getValue().amountProperty());
-        ingMeasurementCol.setCellValueFactory(c -> c.getValue().measurementProperty());
+        ingMeasurementCol.setCellValueFactory(c -> c.getValue().unitProperty());
         ingActionCol.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(c.getValue()));
         ingActionCol.setCellFactory(col -> new TableCell<>() {
             private final Button del = new Button("🗑");
             { del.setOnAction(e -> getTableView().getItems().remove(getItem())); }
-            @Override protected void updateItem(InventoryItem item, boolean empty) {
+            @Override protected void updateItem(Ingredient item, boolean empty) {
                 super.updateItem(item, empty);
                 setGraphic(empty ? null : del);
             }
@@ -59,7 +61,7 @@ public class RecipeAddController {
 
     @FXML
     private void onAddIngredient(ActionEvent evt) {
-        Dialog<InventoryItem> dlg = new Dialog<>();
+        Dialog<Ingredient> dlg = new Dialog<>();
         dlg.setTitle("Add Ingredient");
         dlg.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
@@ -91,12 +93,12 @@ public class RecipeAddController {
         );
 
         dlg.setResultConverter(bt -> bt == ButtonType.OK
-                ? new InventoryItem(nm.getText().trim(),
-                amt.getText().trim(),
+                ? new Ingredient(nm.getText().trim(),
+                Double.parseDouble(amt.getText().trim()),
                 meas.getText().trim())
                 : null
         );
-        Optional<InventoryItem> res = dlg.showAndWait();
+        Optional<Ingredient> res = dlg.showAndWait();
         res.ifPresent(item -> ingredientsTable.getItems().add(item));
     }
 
@@ -107,11 +109,11 @@ public class RecipeAddController {
             new Alert(Alert.AlertType.WARNING, "Recipe name is required.").showAndWait();
             return;
         }
-        RecipeItem r = new RecipeItem(
+        RecipeItem r = new RecipeItem(new Recipe(
                 name,
-                FXCollections.observableArrayList(ingredientsTable.getItems()),
                 descriptionField.getText().trim(),
-                instructionsField.getText().trim()
+                ingredientsTable.getItems(),
+                instructionsField.getText().trim())
         );
         recipes.add(r);
         onCancel(evt);

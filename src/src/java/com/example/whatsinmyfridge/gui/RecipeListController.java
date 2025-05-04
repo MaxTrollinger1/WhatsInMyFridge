@@ -1,5 +1,9 @@
 package com.example.whatsinmyfridge.gui;
 
+import com.example.whatsinmyfridge.storage.IDataPersistence;
+import com.example.whatsinmyfridge.storage.data.Data;
+import com.example.whatsinmyfridge.storage.data.PantryWrapper;
+import com.example.whatsinmyfridge.storage.data.RecipeWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -14,8 +18,9 @@ import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
-public class RecipeListController {
+public class RecipeListController implements IDataPersistence {
     @FXML private TextField searchField;
     @FXML private Button    searchButton;
     @FXML private Button    filterButton;
@@ -23,10 +28,7 @@ public class RecipeListController {
     @FXML private Button    addRecipeButton;
     @FXML private Button    backButton;
 
-    private static final ObservableList<RecipeItem> recipes = FXCollections.observableArrayList(
-            new RecipeItem("Butter Chicken"),
-            new RecipeItem("Pico De Gallo"),
-            new RecipeItem("Salisbury Steak")
+    private static ObservableList<RecipeItem> recipes = FXCollections.observableArrayList(
     );
 
     @FXML
@@ -138,5 +140,21 @@ public class RecipeListController {
         Parent home = FXMLLoader.load(getClass().getResource("/com/whatsinmyfridgegui/HomeScreen.fxml"));
         Stage st = (Stage)((Node)evt.getSource()).getScene().getWindow();
         st.getScene().setRoot(home);
+    }
+
+    @Override
+    public void loadData(Data data) {
+        if (data instanceof RecipeWrapper recipeWrapper) {
+            System.out.println("Recipe Information: " + recipeWrapper.toString());
+            recipes = FXCollections.observableArrayList(recipeWrapper.recipes);
+        }
+    }
+
+    @Override
+    public void saveData(Data data) {
+        if (data instanceof RecipeWrapper recipeWrapper) {
+            System.out.println("Saving PantryWrapper data...");
+            recipeWrapper.recipes = new ArrayList<>(recipes);
+        }
     }
 }

@@ -1,3 +1,5 @@
+package com.example.whatsinmyfridge.model;
+
 import java.util.*;
 
 public class RecipeChecker {

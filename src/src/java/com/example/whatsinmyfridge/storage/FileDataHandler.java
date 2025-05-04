@@ -12,7 +12,6 @@ public class FileDataHandler {
     private static final Gson gson = new GsonBuilder()
             .registerTypeHierarchyAdapter(Data.class, new DataAdapter()) // use data adapter
             .setPrettyPrinting()
-            .excludeFieldsWithoutExposeAnnotation()
             .create();
 
     public FileDataHandler(String dataDirPath) {

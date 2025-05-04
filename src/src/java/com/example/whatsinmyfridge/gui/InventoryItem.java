@@ -1,5 +1,6 @@
 package com.example.whatsinmyfridge.gui;
 
+import com.example.whatsinmyfridge.model.Ingredient;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
