@@ -2,15 +2,28 @@ package com.example.whatsinmyfridge.model;
 
 import java.util.*;
 
+/**
+ * Represents a shopping list containing ingredients the user needs to buy.
+ */
 public class ShoppingList {
     private final List<Ingredient> items = new ArrayList<>();
 
+    /**
+     * Returns the list of ingredients currently in the shopping list.
+     *
+     * @return the list of ingredients
+     */
     public List<Ingredient> getItems() {
         return items;
     }
 
+    /**
+     * Adds an ingredient to the shopping list.
+     * If an ingredient with the same name and unit already exists, it increases its amount.
+     *
+     * @param ingredient the ingredient to add
+     */
     public void addItem(Ingredient ingredient) {
-        // Optional: merge with existing item of same name+unit
         for (Ingredient i : items) {
             if (i.getName().equalsIgnoreCase(ingredient.getName())
                     && i.getUnit().equalsIgnoreCase(ingredient.getUnit())) {
@@ -21,14 +34,29 @@ public class ShoppingList {
         items.add(ingredient);
     }
 
+    /**
+     * Removes an ingredient from the shopping list.
+     *
+     * @param ingredient the ingredient to remove
+     */
     public void removeItem(Ingredient ingredient) {
         items.remove(ingredient);
     }
 
+    /**
+     * Clears all ingredients from the shopping list.
+     */
     public void clearList() {
         items.clear();
     }
 
+    /**
+     * Generates a shopping list based on missing ingredients needed for a recipe.
+     * Considers the current contents of the fridge and uses unit conversion when needed.
+     *
+     * @param recipe    the recipe to generate a shopping list for
+     * @param converter the unit converter to use for unit matching
+     */
     public void generateFromRecipe(Recipe recipe, UnitConverter converter) {
         Fridge fridge = Fridge.getInstance();
         for (Ingredient needed : recipe.getIngredients()) {
