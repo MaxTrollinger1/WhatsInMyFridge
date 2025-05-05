@@ -76,7 +76,7 @@
                     <execution>
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>com.example.whatsinmyfridge.WhatsInMyFridgeApp</mainClass>
+                            <mainClass>com.example.whatsinmyfridge.Launcher</mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>
                             <jlinkImageName>app</jlinkImageName>
