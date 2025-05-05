@@ -1,0 +1,75 @@
+/* page background */
+.root {
+  -fx-background-color: #F2F2F7;
+}
+
+/* App title at top—bigger now */
+.title-label {
+  -fx-font-size: 32px;
+  -fx-font-weight: bold;
+  -fx-text-fill: #1A1A1A;
+}
+
+/* entire white card */
+.panel {
+  -fx-background-color: white;
+  -fx-background-radius: 12px;
+  -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 2);
+}
+
+/* header bar: slightly bolder teal */
+.panel-header {
+  -fx-background-color: #79C4B5;   /* darker */
+  -fx-background-radius: 12px 12px 0 0;
+  -fx-padding: 8px 16px;
+}
+
+/* footer bar: more washed-out */
+.panel-footer {
+  -fx-background-color: #CDECE9;   /* lighter */
+  -fx-background-radius: 0 0 12px 12px;
+  -fx-padding: 8px 16px;
+}
+
+/* section header text */
+.section-label {
+  -fx-font-size: 18px;
+  -fx-font-weight: bold;
+  -fx-text-fill: white;
+}
+
+/* purple buttons unchanged */
+.purple-button {
+  -fx-background-color: #6B46C1;
+  -fx-text-fill: white;
+  -fx-background-radius: 20px;
+  -fx-padding: 6 16;
+  -fx-font-weight: bold;
+}
+
+/* icon-only action buttons (+/−) */
+.action-button {
+  -fx-background-color: transparent;
+  -fx-border-color: transparent;
+  -fx-font-size: 20px;
+  -fx-text-fill: #4A4A4A;
+  -fx-cursor: hand;
+}
+
+/* trash icon red */
+.action-button.delete-button {
+  -fx-text-fill: #E53E3E;
+}
+
+/* hover states */
+.action-button:hover {
+  -fx-text-fill: #6B46C1;
+}
+.action-button.delete-button:hover {
+  -fx-text-fill: #C53030;
+}
+
+/* tables transparent so panel shows through */
+.table-view {
+  -fx-background-color: transparent;
+}

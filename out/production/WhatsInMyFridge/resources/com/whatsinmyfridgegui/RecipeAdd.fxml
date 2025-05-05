@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/19"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.whatsinmyfridge.gui.RecipeAddController"
+            prefWidth="600" prefHeight="400">
+
+    <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10"
+          AnchorPane.rightAnchor="10" AnchorPane.bottomAnchor="10">
+
+        <TextField fx:id="nameField" promptText="Recipe Name"/>
+
+        <TextArea fx:id="descriptionField" promptText="Description"
+                  prefRowCount="3"/>
+
+        <TableView fx:id="ingredientsTable" prefHeight="150">
+            <columns>
+                <TableColumn fx:id="ingNameCol" text="Name"/>
+                <TableColumn fx:id="ingAmountCol" text="Amount"/>
+                <TableColumn fx:id="ingMeasurementCol" text="Measurement"/>
+                <TableColumn fx:id="ingActionCol" text=""/>
+            </columns>
+        </TableView>
+
+        <HBox spacing="10" alignment="CENTER_RIGHT">
+            <Button fx:id="addIngredientButton" text="Add Ingredient"
+                    onAction="#onAddIngredient"/>
+        </HBox>
+
+        <TextArea fx:id="instructionsField" promptText="Instructions"
+                  prefRowCount="5"/>
+
+        <HBox spacing="10" alignment="CENTER_RIGHT">
+            <Button text="Cancel" onAction="#onCancel"/>
+            <Button text="Save"   onAction="#onSave"/>
+        </HBox>
+
+    </VBox>
+</AnchorPane>

@@ -50,6 +50,14 @@
     </dependencies>
 
     <build>
+        <sourceDirectory>${project.basedir}/src</sourceDirectory>
+
+        <resources>
+            <resource>
+                <directory>${project.basedir}/src/resources</directory>
+            </resource>
+        </resources>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -66,11 +74,9 @@
                 <version>0.0.8</version>
                 <executions>
                     <execution>
-                        <!-- Default configuration for running with: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>com.example.whatsinmyfridge/com.example.whatsinmyfridge.HelloApplication
-                            </mainClass>
+                            <mainClass>com.example.whatsinmyfridge.WhatsInMyFridgeApp</mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>
                             <jlinkImageName>app</jlinkImageName>
