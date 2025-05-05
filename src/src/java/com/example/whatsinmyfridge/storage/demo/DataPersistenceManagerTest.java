@@ -18,7 +18,7 @@ public class DataPersistenceManagerTest {
         DemoImplementor useScript = new DemoImplementor();
         manager.RegisterPersistenceObject(useScript);
 
-        manager.initialize();
+        //manager.initialize();
 
         Scanner scanner = new Scanner(System.in);
 

@@ -1,5 +1,8 @@
 package com.example.whatsinmyfridge.gui;
 
+import com.example.whatsinmyfridge.WhatsInMyFridgeApp;
+import com.example.whatsinmyfridge.model.Ingredient;
+import com.example.whatsinmyfridge.model.Recipe;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -15,6 +18,7 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Optional;
 
 public class HomescreenController {
@@ -45,28 +49,77 @@ public class HomescreenController {
         invAmountCol      .setCellValueFactory(c -> c.getValue().amountProperty());
         invMeasurementCol .setCellValueFactory(c -> c.getValue().measurementProperty());
         invActionCol      .setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(c.getValue()));
-        invActionCol      .setCellFactory(col -> new QuantityCell());
+        invActionCol      .setCellFactory(col -> new QuantityCell(inventoryTable));
+
 
         groItemCol        .setCellValueFactory(c -> c.getValue().nameProperty());
         groAmountCol      .setCellValueFactory(c -> c.getValue().amountProperty());
         groMeasurementCol .setCellValueFactory(c -> c.getValue().measurementProperty());
         groActionCol      .setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(c.getValue()));
-        groActionCol      .setCellFactory(col -> new QuantityCell());
+        groActionCol      .setCellFactory(col -> new QuantityCell(groceryTable));
 
-        inventoryTable.setItems(FXCollections.observableArrayList(
-                new InventoryItem("Apples","3",""),
-                new InventoryItem("Ground Beef","2","lbs"),
-                new InventoryItem("Milk","1","Gallon")
-        ));
-        groceryTable.setItems(FXCollections.observableArrayList(
-                new InventoryItem("Bananas","3",""),
-                new InventoryItem("Eggs","12","Dozen"),
-                new InventoryItem("Butter","","")
-        ));
-        recipesList.setItems(FXCollections.observableArrayList(
-                "Butter Chicken","Pico De Gallo","Salisbury Steak"
-        ));
+        try
+        {
+            SetLists();
+        } catch (Exception e) {}
     }
+
+    public void SetLists()
+    {
+        set_ingredients();
+
+        set_groceries();
+
+        set_recipes();
+    }
+
+    void set_ingredients()
+    {
+        ArrayList<Ingredient> ingredients = WhatsInMyFridgeApp.inventory.getIngredients();
+        ArrayList<InventoryItem> i_items = new ArrayList<>();
+        inventoryTable.getItems().clear();
+
+        for (int i = 0; i < ingredients.size(); i++)
+        {
+            i_items.add(new InventoryItem(
+                    ingredients.get(i).getName(),
+                    String.valueOf(ingredients.get(i).getAmount()),
+                    ingredients.get(i).getUnit()));
+        }
+
+        inventoryTable.setItems(FXCollections.observableArrayList(i_items));
+    }
+
+    void set_groceries()
+    {
+        ArrayList<Ingredient> groceries = WhatsInMyFridgeApp.inventory.getGroceries();
+        ArrayList<InventoryItem> i_items = new ArrayList<>();
+        groceryTable.getItems().clear();
+
+        for (int i = 0; i < groceries.size(); i++)
+        {
+            i_items.add(new InventoryItem(
+                    groceries.get(i).getName(),
+                    String.valueOf(groceries.get(i).getAmount()),
+                    groceries.get(i).getUnit()));
+        }
+
+        groceryTable.setItems(FXCollections.observableArrayList(i_items));
+    }
+
+    void set_recipes()
+    {
+        ArrayList<Recipe> recipeSave = WhatsInMyFridgeApp.inventory.getRecipes();
+        ArrayList<String> recipeNames = new ArrayList<>();
+
+        for (Recipe r : recipeSave) {
+            recipeNames.add(r.getName());
+        }
+
+        recipesList.setItems(FXCollections.observableArrayList(recipeNames));
+    }
+
+
 
     @FXML public void onAddInventory(ActionEvent evt) {
         showAddDialog("Add Inventory Item", inventoryTable);
@@ -113,8 +166,22 @@ public class HomescreenController {
                 ? new InventoryItem(nameF.getText().trim(), amtF.getText().trim(), measF.getText().trim())
                 : null
         );
+
         Optional<InventoryItem> res = dlg.showAndWait();
-        res.ifPresent(table.getItems()::add);
+        res.ifPresent(result -> {
+            // Create Ingredient from the InventoryItem
+            Ingredient ingredient = new Ingredient(result.getName(),
+                    Double.parseDouble(result.getAmount()),
+                    result.getMeasurement());
+            // Add Ingredient to the inventory or grocery list depending on table
+            if (table == inventoryTable) {
+                WhatsInMyFridgeApp.inventory.addIngredient(ingredient);
+            } else if (table == groceryTable) {
+                WhatsInMyFridgeApp.inventory.addGrocery(ingredient);
+            }
+            // Add InventoryItem to the table
+            table.getItems().add(result);
+        });
     }
 
     @FXML public void onViewAllRecipes(ActionEvent evt) throws IOException {
@@ -124,12 +191,14 @@ public class HomescreenController {
     }
 
     /** Icons‐only +/− and 🗑 for delete; larger size and transparent chrome */
-    private static class QuantityCell extends TableCell<InventoryItem,InventoryItem> {
+    private class QuantityCell extends TableCell<InventoryItem,InventoryItem> {
         private final Button plus  = new Button("+");
         private final Button minus = new Button("−");
         private final Button del   = new Button("🗑");
+        private final TableView<InventoryItem> parentTable;
 
-        QuantityCell() {
+        QuantityCell(TableView<InventoryItem> table) {
+            this.parentTable = table;
             String style = "-fx-background-color: transparent; -fx-border-color: transparent; -fx-padding: 0; -fx-font-size: 16px;";
             plus .setStyle(style);
             minus.setStyle(style);
@@ -141,15 +210,35 @@ public class HomescreenController {
 
             plus .setOnAction(e -> adjust(1));
             minus.setOnAction(e -> adjust(-1));
-            del  .setOnAction(e -> getTableView().getItems().remove(getItem()));
+            del  .setOnAction(e -> {
+                InventoryItem item = getItem();
+                if (item == null) return;
+
+                if (parentTable == inventoryTable) {
+                    WhatsInMyFridgeApp.inventory.removeIngredient(item.getName());
+                } else if (parentTable == groceryTable) {
+                    WhatsInMyFridgeApp.inventory.removeGrocery(item.getName());
+                }
+
+                parentTable.getItems().remove(item);
+            });
         }
 
         private void adjust(int delta) {
             InventoryItem item = getItem();
+            Ingredient ingredient = new Ingredient(item.getName(),
+                    Double.parseDouble(item.getAmount()),
+                    item.getMeasurement());
             if (item == null) return;
             String t = item.getAmount();
-            int v = t.matches("\\d+") ? Integer.parseInt(t) : 0;
+            Double v = Double.parseDouble(t);
             item.setAmount(String.valueOf(Math.max(0, v + delta)));
+
+            if (parentTable == inventoryTable) {
+                WhatsInMyFridgeApp.inventory.editIngredient(ingredient);
+            } else if (parentTable == groceryTable) {
+                WhatsInMyFridgeApp.inventory.editGrocery(ingredient);
+            }
         }
 
         @Override

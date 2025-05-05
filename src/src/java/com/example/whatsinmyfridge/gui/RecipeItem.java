@@ -26,7 +26,14 @@ public class RecipeItem {
     /** Full constructor, pass in your own data */
     public RecipeItem(Recipe recipe) {
         this.name.set(recipe.getName());
-        this.ingredients.setAll((InventoryItem)FXCollections.observableArrayList(recipe.getIngredients()));
+        for (var ingredient : recipe.getIngredients()) {
+            InventoryItem item = new InventoryItem(
+                    ingredient.getName(),
+                    String.valueOf(ingredient.getAmount()),
+                    ingredient.getUnit()
+            );
+            this.ingredients.add(item);
+        }
         this.description.set(recipe.getDescription());
         this.instructions.set(recipe.getInstructions());
     }

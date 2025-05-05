@@ -1,10 +1,14 @@
 package com.example.whatsinmyfridge.gui;
 
+import com.example.whatsinmyfridge.WhatsInMyFridgeApp;
+import com.example.whatsinmyfridge.model.Ingredient;
+import com.example.whatsinmyfridge.model.Recipe;
 import com.example.whatsinmyfridge.storage.IDataPersistence;
 import com.example.whatsinmyfridge.storage.data.Data;
 import com.example.whatsinmyfridge.storage.data.PantryWrapper;
 import com.example.whatsinmyfridge.storage.data.RecipeWrapper;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -20,7 +24,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class RecipeListController implements IDataPersistence {
+public class RecipeListController {
     @FXML private TextField searchField;
     @FXML private Button    searchButton;
     @FXML private Button    filterButton;
@@ -36,6 +40,13 @@ public class RecipeListController implements IDataPersistence {
         recipeListView.setItems(recipes);
         // ensure scrolling
         recipeListView.setFocusTraversable(true);
+
+        this.recipes.addListener((ListChangeListener<RecipeItem>) change -> {
+            while (change.next()) {
+                OnRecipeListUpdated();
+                break;
+            }
+        });
 
         recipeListView.setCellFactory(lv -> new ListCell<>() {
             private final Label nameLabel = new Label();
@@ -100,6 +111,26 @@ public class RecipeListController implements IDataPersistence {
         });
     }
 
+    public void SetLists()
+    {
+        ArrayList<RecipeItem> recipeItems = new ArrayList<>();
+        ArrayList<Recipe> recs;
+        try
+        {
+            recs = WhatsInMyFridgeApp.inventory.getRecipes();
+        } catch (Exception e) { // Catch to ensure recipes is correctly pulled
+            return;
+        }
+
+        for (Recipe r : recs)
+        {
+            recipeItems.add(new RecipeItem(r));
+        }
+
+        this.recipes = FXCollections.observableArrayList(recipeItems);
+        recipeListView.setItems(this.recipes);
+    }
+
     @FXML
     private void onSearch(ActionEvent evt) {
         String text = searchField.getText().trim().toLowerCase();
@@ -142,19 +173,22 @@ public class RecipeListController implements IDataPersistence {
         st.getScene().setRoot(home);
     }
 
-    @Override
-    public void loadData(Data data) {
-        if (data instanceof RecipeWrapper recipeWrapper) {
-            System.out.println("Recipe Information: " + recipeWrapper.toString());
-            recipes = FXCollections.observableArrayList(recipeWrapper.recipes);
+    public void OnRecipeListUpdated()
+    {
+        System.out.println("onRecipeListUpdated");
+        ArrayList<RecipeItem> recipeItems = new ArrayList<>(recipes);
+        ArrayList<Recipe> recipes1 = new ArrayList<>();
+
+        for (RecipeItem r : recipeItems)
+        {
+            ArrayList<Ingredient> ingredients = new ArrayList<>();
+            for (InventoryItem i : r.getIngredients())
+            {
+                ingredients.add(new Ingredient(i.getName(), Double.parseDouble(i.getAmount()), i.getMeasurement()));
+            }
+            recipes1.add(new Recipe(r.getName(), r.getDescription(), ingredients, r.getInstructions()));
         }
+        WhatsInMyFridgeApp.inventory.updateRecipeList(recipes1);
     }
 
-    @Override
-    public void saveData(Data data) {
-        if (data instanceof RecipeWrapper recipeWrapper) {
-            System.out.println("Saving PantryWrapper data...");
-            recipeWrapper.recipes = new ArrayList<>(recipes);
-        }
-    }
 }

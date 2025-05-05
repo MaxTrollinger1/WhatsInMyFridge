@@ -4,10 +4,18 @@ package com.example.whatsinmyfridge.model;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import com.google.gson.annotations.Expose;
+
 public class Ingredient {
+    @Expose
     private String name;
+    @Expose
     private double amount;
+    @Expose
     private String unit;
+
+    public Ingredient() {
+    }
 
     public Ingredient(String name, double amount, String unit) {
         this.name = name;

@@ -1,5 +1,6 @@
 package com.example.whatsinmyfridge.gui;
 
+import com.example.whatsinmyfridge.WhatsInMyFridgeApp;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.ObservableList;
@@ -117,9 +118,12 @@ public class RecipeDetailController {
         } else {
             recipe.setName(nameField.getText().trim());
             recipe.setDescription(descriptionArea.getText().trim());
-            recipe.setInstructions(instructionsArea.getText().trim());
+            recipe.setInstructions(
+                    instructionsArea != null ? instructionsArea.getText().trim() : ""
+            );
             editMode = false;
             toggleSaveButton.setText("Edit");
+            WhatsInMyFridgeApp.instance.recipeListController.OnRecipeListUpdated(); // Call update after save
             enterViewMode();
         }
     }

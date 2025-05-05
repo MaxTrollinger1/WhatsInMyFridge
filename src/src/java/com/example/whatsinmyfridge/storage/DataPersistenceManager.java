@@ -44,6 +44,8 @@ public class DataPersistenceManager {
 
         wrappers.add(new PantryWrapper(LocalTime.now().toString()));
         wrappers.add(new RecipeWrapper(LocalTime.now().toString()));
+
+        SaveData();
     }
 
     /// Loads saved data, or initializes new data if none is found
@@ -55,6 +57,7 @@ public class DataPersistenceManager {
         {
             System.out.println("No saved data found. Creating new save...");
             NewSave();
+            return;
         }
 
         // Pass loaded data to all persistence objects

@@ -2,12 +2,20 @@ package com.example.whatsinmyfridge.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.google.gson.annotations.Expose;
 
 public class Recipe {
+    @Expose
     private String name;
+    @Expose
     private String description;
+    @Expose
     private List<Ingredient> ingredients;
+    @Expose
     private String instructions;
+
+    public Recipe()
+    {}
 
     public Recipe(String name)
     {
@@ -22,6 +30,7 @@ public class Recipe {
         this.name = name;
         this.description = description;
         this.ingredients = ingredients;
+        this.instructions = instructions;
     }
 
     // Getters and Setters
