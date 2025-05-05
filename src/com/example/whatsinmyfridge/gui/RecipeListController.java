@@ -5,10 +5,6 @@ import com.example.whatsinmyfridge.model.Ingredient;
 import com.example.whatsinmyfridge.model.Recipe;
 import com.example.whatsinmyfridge.model.RecipeChecker;
 import com.example.whatsinmyfridge.model.UnitConverter;
-import com.example.whatsinmyfridge.storage.IDataPersistence;
-import com.example.whatsinmyfridge.storage.data.Data;
-import com.example.whatsinmyfridge.storage.data.PantryWrapper;
-import com.example.whatsinmyfridge.storage.data.RecipeWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -60,22 +56,21 @@ public class RecipeListController {
         recipeListView.setCellFactory(lv -> new ListCell<>() {
             private final Label nameLabel = new Label();
             private final Region spacer    = new Region();
-            private final ToggleButton flagBtn = new ToggleButton("⚑");
+            private final ToggleButton delBtn = new ToggleButton("🗑");
             private final HBox hbox;
 
             {
                 // grow label and spacer, style text larger
                 nameLabel.setStyle("-fx-font-size: 14px;");
                 HBox.setHgrow(spacer, Priority.ALWAYS);
-                flagBtn.setStyle("-fx-font-size:16px; -fx-background-color: transparent;");
-                flagBtn.setOnAction(e -> {
-                    if (flagBtn.isSelected()) {
-                        flagBtn.setStyle("-fx-font-size:16px; -fx-text-fill: gold; -fx-background-color: transparent;");
-                    } else {
-                        flagBtn.setStyle("-fx-font-size:16px; -fx-text-fill: black; -fx-background-color: transparent;");
+                delBtn.setStyle("-fx-font-size:16px; -fx-background-color: transparent;");
+                delBtn.setOnAction(e -> {
+                    if(WhatsInMyFridgeApp.inventory.removeRecipe(getItem().getName()))
+                    {
+                        recipeListView.getItems().remove(getItem());
                     }
                 });
-                hbox = new HBox(10, nameLabel, spacer, flagBtn);
+                hbox = new HBox(10, nameLabel, spacer, delBtn);
                 hbox.setStyle("-fx-padding: 5px;");
             }
 

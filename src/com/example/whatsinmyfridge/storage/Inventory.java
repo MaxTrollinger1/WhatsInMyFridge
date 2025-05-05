@@ -97,6 +97,16 @@ public class Inventory implements IDataPersistence {
         else return new ArrayList<>();
     }
 
+    public boolean removeRecipe(String name) {
+        for (Recipe r : this.recipe.recipes) {
+            if (r.getName().equals(name)) {
+                this.recipe.recipes.remove(r);
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void updateRecipeList(ArrayList<Recipe> recipes)
     {
         this.recipe.recipes = recipes;

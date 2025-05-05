@@ -50,11 +50,11 @@
     </dependencies>
 
     <build>
-        <sourceDirectory>${project.basedir}/src</sourceDirectory>
+        <sourceDirectory>src</sourceDirectory>
 
         <resources>
             <resource>
-                <directory>${project.basedir}/src/resources</directory>
+                <directory>src/resources</directory>
             </resource>
         </resources>
 
