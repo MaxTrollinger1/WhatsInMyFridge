@@ -9,6 +9,8 @@ import com.example.whatsinmyfridge.storage.data.PantryWrapper;
 import com.example.whatsinmyfridge.storage.data.RecipeWrapper;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 public class Inventory implements IDataPersistence {
 
@@ -99,6 +101,27 @@ public class Inventory implements IDataPersistence {
     {
         this.recipe.recipes = recipes;
     }
+    //endregion
+
+    //region Logic
+
+    public Optional<Ingredient> findMatchingIngredient(String name, String unit) { // unit should be optional
+        return pantry.foodItems.stream()
+                .filter(i -> i.getName().equalsIgnoreCase(name) && i.getUnit().equalsIgnoreCase(unit))
+                .findFirst();
+    }
+
+    public List<Ingredient> getMatchingIngredients(String name) {
+        List<Ingredient> matches = new ArrayList<>();
+        for (Ingredient i : pantry.foodItems) {
+            if (i.getName().equalsIgnoreCase(name)) {
+                matches.add(i);
+            }
+        }
+        return matches;
+    }
+
+
     //endregion
 
     //region Data

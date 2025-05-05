@@ -3,6 +3,8 @@ package com.example.whatsinmyfridge.gui;
 import com.example.whatsinmyfridge.WhatsInMyFridgeApp;
 import com.example.whatsinmyfridge.model.Ingredient;
 import com.example.whatsinmyfridge.model.Recipe;
+import com.example.whatsinmyfridge.model.RecipeChecker;
+import com.example.whatsinmyfridge.model.UnitConverter;
 import com.example.whatsinmyfridge.storage.IDataPersistence;
 import com.example.whatsinmyfridge.storage.data.Data;
 import com.example.whatsinmyfridge.storage.data.PantryWrapper;
@@ -35,11 +37,18 @@ public class RecipeListController {
     private static ObservableList<RecipeItem> recipes = FXCollections.observableArrayList(
     );
 
+    boolean filtering = false;
+    RecipeChecker checker;
+    UnitConverter converter;
+
     @FXML
     public void initialize() {
         recipeListView.setItems(recipes);
         // ensure scrolling
         recipeListView.setFocusTraversable(true);
+
+        converter = new UnitConverter();
+        checker = new RecipeChecker(converter);
 
         this.recipes.addListener((ListChangeListener<RecipeItem>) change -> {
             while (change.next()) {
@@ -103,12 +112,14 @@ public class RecipeListController {
         });
 
         searchButton.setOnAction(this::onSearch);
-        filterButton.setOnAction(e -> { /* no-op */ });
+        filterButton.setOnAction(e -> { onFilter(e); });
         addRecipeButton.setOnAction(this::onAddRecipe);
         backButton.setOnAction(e -> {
             try { onBack(e); }
             catch (IOException ex) { ex.printStackTrace(); }
         });
+
+        filterButton.setText("✗");
     }
 
     public void SetLists()
@@ -149,7 +160,36 @@ public class RecipeListController {
 
     @FXML
     private void onFilter(ActionEvent evt) {
-        // stub: filter logic
+
+        if(filtering)
+        {
+            filtering = false;
+            recipeListView.setItems(recipes);
+            filterButton.setText("✗");
+        }
+        else
+        {
+            filtering = true;
+            ObservableList<RecipeItem> filtered = FXCollections.observableArrayList();
+            ObservableList<RecipeItem> filtered2 = FXCollections.observableArrayList();
+
+            ArrayList<Ingredient> ings = new ArrayList<>();
+
+            for (RecipeItem r : recipes) {
+                ings.clear();
+                for (InventoryItem i : r.getIngredients())
+                {
+                    ings.add(new Ingredient(i.getName(), Double.parseDouble(i.getAmount()), i.getMeasurement()));
+                }
+
+                if(checker.canMakeRecipe(new Recipe(r.getName(), r.getDescription(), ings, r.getInstructions())))
+                {
+                    filtered.add(r);
+                }
+            }
+            recipeListView.setItems(filtered);
+            filterButton.setText("✓");
+        }
     }
 
     @FXML
