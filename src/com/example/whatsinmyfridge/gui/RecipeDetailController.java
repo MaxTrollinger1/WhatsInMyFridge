@@ -18,6 +18,12 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+/**
+ * Controller for viewing and editing a single recipe's details.
+ * <p>
+ * Supports toggling between view and edit modes for recipe name,
+ * description, instructions, and ingredients.
+ */
 public class RecipeDetailController {
 
     @FXML private Button backButton;
@@ -42,6 +48,10 @@ public class RecipeDetailController {
     private RecipeItem recipe;
     private boolean editMode = false;
 
+    /**
+     * Initializes cell factories, edit handlers, and default view mode.
+     * Called automatically after FXML is loaded.
+     */
     @FXML
     private void initialize() {
         // wire button handlers
@@ -89,6 +99,10 @@ public class RecipeDetailController {
         enterViewMode();
     }
 
+    /**
+     * Binds recipe data to UI fields and tables.
+     * @param recipe recipe item to display
+     */
     public void setRecipe(RecipeItem recipe) {
         this.recipe = recipe;
         nameLabel.setText(recipe.getName());
@@ -109,6 +123,10 @@ public class RecipeDetailController {
         instructionsArea.setText(recipe.getInstructions());
     }
 
+    /**
+     * Handles toggling between view mode and edit mode, saving changes on save.
+     * @param evt action event from the toggle button
+     */
     @FXML
     private void onToggleSave(ActionEvent evt) {
         if (!editMode) {
@@ -116,6 +134,7 @@ public class RecipeDetailController {
             toggleSaveButton.setText("Save");
             enterEditMode();
         } else {
+            // Apply edits to recipe
             recipe.setName(nameField.getText().trim());
             recipe.setDescription(descriptionArea.getText().trim());
             recipe.setInstructions(
@@ -128,6 +147,9 @@ public class RecipeDetailController {
         }
     }
 
+    /**
+     * Switches UI into read-only display mode.
+     */
     private void enterViewMode() {
         nameLabel.setVisible(true);   nameLabel.setManaged(true);
         nameField.setVisible(false);  nameField.setManaged(false);
@@ -145,6 +167,9 @@ public class RecipeDetailController {
         addIngredientButton.setManaged(false);
     }
 
+    /**
+     * Switches UI into editable mode for all recipe fields.
+     */
     private void enterEditMode() {
         nameLabel.setVisible(false);  nameLabel.setManaged(false);
         nameField.setVisible(true);   nameField.setManaged(true);
@@ -162,6 +187,10 @@ public class RecipeDetailController {
         addIngredientButton.setManaged(true);
     }
 
+    /**
+     * Adds a new ingredient via dialog when in edit mode.
+     * @param evt action event from the "Add Ingredient" button
+     */
     @FXML
     private void onAddIngredient(ActionEvent evt) {
         if (!editMode) return;
@@ -201,6 +230,10 @@ public class RecipeDetailController {
         dlg.showAndWait().ifPresent(item -> ingredientsTable.getItems().add(item));
     }
 
+    /**
+     * exits edit mode, returns to recipe list.
+     * @param evt action event from the back button
+     */
     @FXML
     private void onBack(ActionEvent evt) {
         try {

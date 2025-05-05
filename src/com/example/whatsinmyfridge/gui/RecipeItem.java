@@ -10,6 +10,12 @@ import javafx.collections.ObservableList;
 
 import java.util.List;
 
+/**
+ * View model wrapping a Recipe for display in the UI.
+ * <p>
+ * Exposes observable properties for use in JavaFX controls,
+ * including name, flagged state, ingredients, description, and instructions.
+ */
 public class RecipeItem {
     private final StringProperty name         = new SimpleStringProperty();
     private final BooleanProperty flagged     = new SimpleBooleanProperty(false);
@@ -23,7 +29,11 @@ public class RecipeItem {
         this(new Recipe(name));
     }
 
-    /** Full constructor, pass in your own data */
+    /**
+     * Constructs a RecipeItem from an existing Recipe model.
+     * Populates all observable properties from the Recipe data.
+     * @param recipe the Recipe to wrap
+     */
     public RecipeItem(Recipe recipe) {
         this.name.set(recipe.getName());
         for (var ingredient : recipe.getIngredients()) {
@@ -38,22 +48,39 @@ public class RecipeItem {
         this.instructions.set(recipe.getInstructions());
     }
 
-    public StringProperty nameProperty()         { return name;        }
-    public BooleanProperty flaggedProperty()     { return flagged;     }
+    /** @return observable name property */
+    public StringProperty nameProperty() { return name; }
+    /** @return observable flagged property */
+    public BooleanProperty flaggedProperty() { return flagged; }
+    /** @return observable list of ingredients */
     public ObservableList<InventoryItem> getIngredients() { return ingredients; }
-    public StringProperty descriptionProperty()  { return description; }
-    public StringProperty instructionsProperty() { return instructions;}
+    /** @return observable description property */
+    public StringProperty descriptionProperty() { return description; }
+    /** @return observable instructions property */
+    public StringProperty instructionsProperty() { return instructions; }
 
-    public String getName()        { return name.get();         }
-    public boolean isFlagged()     { return flagged.get();      }
-    public String getDescription(){ return description.get();  }
-    public String getInstructions(){ return instructions.get(); }
+    /** @return recipe name */
+    public String getName() { return name.get(); }
+    /** @return flagged state */
+    public boolean isFlagged() { return flagged.get(); }
+    /** @return recipe description */
+    public String getDescription() { return description.get(); }
+    /** @return recipe instructions */
+    public String getInstructions() { return instructions.get(); }
 
-    public void setName(String n)           { name.set(n);           }
-    public void setFlagged(boolean f)       { flagged.set(f);        }
-    public void setDescription(String d)    { description.set(d);    }
-    public void setInstructions(String i)   { instructions.set(i);   }
+    /** @param n sets the recipe name */
+    public void setName(String n) { name.set(n); }
+    /** @param f sets the flagged state */
+    public void setFlagged(boolean f) { flagged.set(f); }
+    /** @param d sets the description */
+    public void setDescription(String d) { description.set(d); }
+    /** @param i sets the instructions */
+    public void setInstructions(String i) { instructions.set(i); }
 
+    /**
+     * Returns the recipe name for display in lists.
+     * @return recipe name string
+     */
     @Override
     public String toString() { return getName(); }
 }

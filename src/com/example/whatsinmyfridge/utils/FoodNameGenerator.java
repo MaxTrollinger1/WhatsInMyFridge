@@ -2,7 +2,9 @@ package com.example.whatsinmyfridge.utils;
 
 import java.util.Random;
 
-/// Just used for testing
+/**
+ * Used for testing purposes.
+ */
 public class FoodNameGenerator {
 
     private static final String[] FOOD_NAMES = {

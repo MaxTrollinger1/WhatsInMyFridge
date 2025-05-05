@@ -4,11 +4,23 @@ import com.example.whatsinmyfridge.storage.data.Data;
 import com.google.gson.*;
 import java.lang.reflect.Type;
 
-/// Third party class to handle polymorphism of serialized classes
+/**
+ * Gson adapter handling polymorphic serialization and deserialization of Data subclasses.
+ * <p>
+ * Inserts a CLASSNAME field alongside the serialized INSTANCE data to preserve type information.
+ */
 public class DataAdapter implements JsonSerializer<Data>, JsonDeserializer<Data> {
     private static final String CLASSNAME = "CLASSNAME";
     private static final String INSTANCE = "INSTANCE";
 
+    /**
+     * Serializes a Data object by writing its class name and its JSON fields.
+     *
+     * @param src the Data instance to serialize
+     * @param typeOfSrc unused type token
+     * @param context unused context
+     * @return JSON object containing CLASSNAME and INSTANCE entries
+     */
     @Override
     public JsonElement serialize(Data src, Type typeOfSrc, JsonSerializationContext context) {
         JsonObject result = new JsonObject();
@@ -25,6 +37,15 @@ public class DataAdapter implements JsonSerializer<Data>, JsonDeserializer<Data>
         return result;
     }
 
+    /**
+     * Deserializes JSON into the appropriate Data subclass based on CLASSNAME.
+     *
+     * @param json JSON containing CLASSNAME and INSTANCE
+     * @param typeOfT unused type token
+     * @param context unused context
+     * @return reconstructed Data object
+     * @throws JsonParseException if JSON format is invalid or class is not found
+     */
     @Override
     public Data deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
             throws JsonParseException {

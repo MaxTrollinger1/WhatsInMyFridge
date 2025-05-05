@@ -22,6 +22,12 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.util.ArrayList;
 
+/**
+ * Controller for the recipe list screen.
+ * <p>
+ * Displays, filters, and manages the collection of saved recipes,
+ * including search, availability filtering, addition, deletion, and navigation.
+ */
 public class RecipeListController {
     @FXML private TextField searchField;
     @FXML private Button    searchButton;
@@ -30,6 +36,7 @@ public class RecipeListController {
     @FXML private Button    addRecipeButton;
     @FXML private Button    backButton;
 
+    // Shared list of recipes displayed in the ListView
     private static ObservableList<RecipeItem> recipes = FXCollections.observableArrayList(
     );
 
@@ -37,6 +44,10 @@ public class RecipeListController {
     RecipeChecker checker;
     UnitConverter converter;
 
+    /**
+     * Initializes the ListView, cell factory, and button handlers.
+     * Called automatically after FXML load.
+     */
     @FXML
     public void initialize() {
         recipeListView.setItems(recipes);
@@ -115,8 +126,17 @@ public class RecipeListController {
         });
 
         filterButton.setText("✗");
+        filterButton.setTooltip(new Tooltip("Toggle availability filter: ✓ shows only recipes you can make with your inventory"));
+        searchButton.setTooltip(new Tooltip("Search recipes by name"));
+        addRecipeButton.setTooltip(new Tooltip("Add a new recipe to your collection"));
+        backButton.setTooltip(new Tooltip("Return to the home screen"));
+        recipeListView.setTooltip(new Tooltip("Double-click a recipe to view details"));
     }
 
+    /**
+     * Loads recipes from inventory into the ListView.
+     * Should be called when returning from other screens.
+     */
     public void SetLists()
     {
         ArrayList<RecipeItem> recipeItems = new ArrayList<>();
@@ -137,6 +157,10 @@ public class RecipeListController {
         recipeListView.setItems(this.recipes);
     }
 
+    /**
+     * Filters the ListView to only recipes whose names contain the search text.
+     * @param evt action event from the search button
+     */
     @FXML
     private void onSearch(ActionEvent evt) {
         String text = searchField.getText().trim().toLowerCase();
@@ -153,6 +177,10 @@ public class RecipeListController {
         }
     }
 
+    /**
+     * Toggles availability filter: shows only makeable recipes when enabled.
+     * @param evt action event from the filter button
+     */
     @FXML
     private void onFilter(ActionEvent evt) {
 
@@ -187,6 +215,10 @@ public class RecipeListController {
         }
     }
 
+    /**
+     * Opens the "Add Recipe" screen.
+     * @param evt action event from the add button
+     */
     @FXML
     private void onAddRecipe(ActionEvent evt) {
         try {
@@ -201,6 +233,11 @@ public class RecipeListController {
         }
     }
 
+    /**
+     * Navigates back to the home screen.
+     * @param evt action event from the back button
+     * @throws IOException if FXML load fails
+     */
     @FXML
     private void onBack(ActionEvent evt) throws IOException {
         Parent home = FXMLLoader.load(getClass().getResource("/com/whatsinmyfridgegui/HomeScreen.fxml"));
@@ -208,6 +245,9 @@ public class RecipeListController {
         st.getScene().setRoot(home);
     }
 
+    /**
+     * Updates the inventory with the current recipe list when changes occur.
+     */
     public void OnRecipeListUpdated()
     {
         System.out.println("onRecipeListUpdated");

@@ -12,6 +12,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -21,6 +22,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Optional;
 
+/**
+ * Controller for the home screen, showing pantry inventory, grocery list, and recipes.
+ * <p>
+ * Manages table and list view population and user interactions for adding/removing items
+ * and navigating to the recipe list screen.
+ */
 public class HomescreenController {
 
     @FXML private TableView<InventoryItem> inventoryTable;
@@ -29,6 +36,7 @@ public class HomescreenController {
     @FXML private TableColumn<InventoryItem,String> invMeasurementCol;
     @FXML private TableColumn<InventoryItem,InventoryItem> invActionCol;
     @FXML private Button addInventoryButton;
+    @FXML private Button themeToggleButton;
 
     @FXML private ListView<String> recipesList;
     @FXML private Button viewAllButton;
@@ -40,6 +48,9 @@ public class HomescreenController {
     @FXML private TableColumn<InventoryItem,InventoryItem> groActionCol;
     @FXML private Button addGroceryButton;
 
+    /**
+     * Initializes table columns, cell factories, and populates views after FXML load.
+     */
     @FXML
     public void initialize() {
         inventoryTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
@@ -60,10 +71,25 @@ public class HomescreenController {
 
         try
         {
-            SetLists();
+            SetLists(); // Reset List on entry
         } catch (Exception e) {}
+
+        // Add tooltips for buttons
+        addInventoryButton.setTooltip(new Tooltip("Add a new item to your pantry inventory"));
+        addGroceryButton.setTooltip(new Tooltip("Add a new item to your grocery list"));
+        viewAllButton.setTooltip(new Tooltip("View all saved recipes"));
+
+        // Tooltips for tables
+        inventoryTable.setTooltip(new Tooltip("Your current pantry items. Use +/− to adjust or 🗑 to remove."));
+        groceryTable.setTooltip(new Tooltip("Your grocery list. Use +/− to adjust or 🗑 to remove."));
+
+        // Tooltip for recipe list
+        recipesList.setTooltip(new Tooltip("Recipes you can make with current ingredients"));
     }
 
+    /**
+     * Refreshes pantry, grocery, and recipe views from the inventory.
+     */
     public void SetLists()
     {
         set_ingredients();
@@ -73,6 +99,9 @@ public class HomescreenController {
         set_recipes();
     }
 
+    /**
+     * Populates the inventory table with current pantry items.
+     */
     void set_ingredients()
     {
         ArrayList<Ingredient> ingredients = WhatsInMyFridgeApp.inventory.getIngredients();
@@ -90,6 +119,9 @@ public class HomescreenController {
         inventoryTable.setItems(FXCollections.observableArrayList(i_items));
     }
 
+    /**
+     * Populates the grocery table with current grocery list items.
+     */
     void set_groceries()
     {
         ArrayList<Ingredient> groceries = WhatsInMyFridgeApp.inventory.getGroceries();
@@ -107,6 +139,9 @@ public class HomescreenController {
         groceryTable.setItems(FXCollections.observableArrayList(i_items));
     }
 
+    /**
+     * Populates the recipe list view with saved recipe names.
+     */
     void set_recipes()
     {
         ArrayList<Recipe> recipeSave = WhatsInMyFridgeApp.inventory.getRecipes();
@@ -120,15 +155,27 @@ public class HomescreenController {
     }
 
 
-
+    /**
+     * Handles add-inventory button click by showing an input dialog.
+     * @param evt action event
+     */
     @FXML public void onAddInventory(ActionEvent evt) {
         showAddDialog("Add Inventory Item", inventoryTable);
     }
 
+    /**
+     * Handles add-grocery button click by showing an input dialog.
+     * @param evt action event
+     */
     @FXML public void onAddGrocery(ActionEvent evt) {
         showAddDialog("Add Grocery Item", groceryTable);
     }
 
+    /**
+     * shows a dialog to enter a new InventoryItem and updates the given table and inventory.
+     * @param title dialog title
+     * @param table target table view (inventory or grocery)
+     */
     private void showAddDialog(String title, TableView<InventoryItem> table) {
         Dialog<InventoryItem> dlg = new Dialog<>();
         dlg.setTitle(title);
@@ -184,6 +231,11 @@ public class HomescreenController {
         });
     }
 
+    /**
+     * Navigates to the recipe list view.
+     * @param evt action event from the "View All" button
+     * @throws IOException if FXML load fails
+     */
     @FXML public void onViewAllRecipes(ActionEvent evt) throws IOException {
         Parent root = FXMLLoader.load(getClass().getResource("/com/whatsinmyfridgegui/RecipeList.fxml"));
         Stage st = (Stage)((Node)evt.getSource()).getScene().getWindow();
@@ -197,6 +249,10 @@ public class HomescreenController {
         private final Button del   = new Button("🗑");
         private final TableView<InventoryItem> parentTable;
 
+        /**
+         * Initializes cell with action buttons and handlers.
+         * @param table parent table view (inventory or grocery)
+         */
         QuantityCell(TableView<InventoryItem> table) {
             this.parentTable = table;
             String style = "-fx-background-color: transparent; -fx-border-color: transparent; -fx-padding: 0; -fx-font-size: 16px;";

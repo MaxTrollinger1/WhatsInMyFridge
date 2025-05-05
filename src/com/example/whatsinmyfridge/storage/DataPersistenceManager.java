@@ -7,7 +7,14 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.ArrayList;
 
+/**
+ * Manages loading and saving of application data wrappers via FileDataHandler.
+ * Coordinates IDataPersistence objects and ensures data is initialized or created as needed.
+ */
 public class DataPersistenceManager {
+    /** Singleton instance. */
+    public static DataPersistenceManager instance;
+
     private String dirPath = "WhatsInMyFridge";
 
     private ArrayList<Data> wrappers = new ArrayList<>();
@@ -18,14 +25,16 @@ public class DataPersistenceManager {
 
     //region Initialization
 
-    public static DataPersistenceManager instance;
-
-
+    /**
+     * Constructs the manager (must call initializeStaticInstance before use).
+     */
     public DataPersistenceManager() {
-        // Subscribe to close event (save data on application exit)
+
     }
 
-    /// Initializes the data handler
+    /**
+     * Sets up FileDataHandler and loads existing data or creates new save files.
+     */
     public void initialize() {
         this.dataHandler = new FileDataHandler(getAppDataLocation() + File.separator + dirPath);
         LoadData(); // Attempt to load data
@@ -35,7 +44,9 @@ public class DataPersistenceManager {
 
     //region Operations
 
-    /// If no save could be found, NewSave is called to initialize the individual wrapper files
+    /**
+     * Generates fresh data wrappers and persists them to disk.
+     */
     public void NewSave()
     {
         wrappers.clear();
@@ -46,7 +57,10 @@ public class DataPersistenceManager {
         SaveData();
     }
 
-    /// Loads saved data, or initializes new data if none is found
+    /**
+     * Loads JSON data into wrappers and dispatches to registered persistence objects.
+     * Creates new save if no existing data found.
+     */
     public void LoadData() {
         this.wrappers.clear();
         this.wrappers = dataHandler.load();
@@ -67,8 +81,11 @@ public class DataPersistenceManager {
         }
     }
 
-    /// Saves the current state
+    /**
+     * Instructs persistence objects to write state into wrappers, then saves each wrapper to disk.
+     */
     public void SaveData() {
+        // iterate through persistence objects and request save
         for (IDataPersistence dataPersistenceObj : dataPersistenceObjects) {
             for (Data data : wrappers)
             {
@@ -76,14 +93,16 @@ public class DataPersistenceManager {
             }
         }
 
-
         for (Data data : wrappers)
         {
             dataHandler.save(data);
         }
     }
 
-    /// Registers a new data object
+    /**
+     * Registers an object that should participate in data load/save cycles.
+     * @param persistenceObject object implementing IDataPersistence
+     */
     public void RegisterPersistenceObject(IDataPersistence persistenceObject)
     {
         dataPersistenceObjects.add(persistenceObject);
@@ -93,14 +112,19 @@ public class DataPersistenceManager {
 
     //region Utility
 
-    /// Initializes the static instance of DataPersistenceManager
+    /**
+     * Ensures singleton instance exists. Call before using the manager.
+     */
     public static void initializeStaticInstance() {
         if (instance == null) { // Singleton
             instance = new DataPersistenceManager();
         }
     }
 
-    /// Returns the path for application data storage location
+    /**
+     * Determines OS-appropriate user data folder (e.g., %LOCALAPPDATA% on Windows).
+     * @return absolute path to user-specific app data location
+     */
     public String getAppDataLocation() {
         String os = System.getProperty("os.name").toLowerCase();
 

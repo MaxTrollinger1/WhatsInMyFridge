@@ -6,9 +6,17 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.example.whatsinmyfridge.storage.data.Data;
 
+/**
+ * Reads and writes Data objects to JSON files in a specified directory.
+ * <p>
+ * Uses Gson with a DataAdapter to handle polymorphic Data subclasses.
+ */
 public class FileDataHandler {
     private String dataDirPath = "";
 
+    /**
+     * Gson instance configured for Data serialization/deserialization.
+     */
     private static final Gson gson = new GsonBuilder()
             .registerTypeHierarchyAdapter(Data.class, new DataAdapter()) // use data adapter
             .setPrettyPrinting()
@@ -20,7 +28,11 @@ public class FileDataHandler {
         System.out.println("Saving to: " + dataDirPath);
     }
 
-    /// Reads all json files from directory
+    /**
+     * Loads all JSON files in the data directory into Data objects.
+     *
+     * @return list of deserialized Data instances; empty if none found or on error
+     */
     public ArrayList<Data> load() {
         File directory = new File(dataDirPath);
         ArrayList<Data> loadedDataList = new ArrayList<>();
@@ -60,7 +72,11 @@ public class FileDataHandler {
         return loadedDataList;
     }
 
-    /// Writes data to specified file
+    /**
+     * Saves a Data object as a JSON file named after its fileName property.
+     *
+     * @param data object to serialize and write
+     */
     public void save(Data data) {
         String fullPath = dataDirPath + File.separator + data.fileName;
         File file = new File(fullPath);
